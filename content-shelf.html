@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Shelf</title>
+<style>
+  :root {
+    --bg: #FBFAF6;
+    --card: #FFFFFF;
+    --ink: #1A1A17;
+    --soft: #6E6E66;
+    --line: #E7E5DC;
+    --accent: #A9C23F;
+    --accent-ink: #3B4718;
+    --danger: #B4472F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 32px 20px 100px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+  .sub { color: var(--soft); font-size: 15px; margin-top: 6px; }
+
+  .addbar { margin: 28px 0 8px; }
+  .addbtn {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    padding: 11px 20px;
+    cursor: pointer;
+  }
+  .addbtn:hover { opacity: 0.9; }
+
+  .form {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 0 8px;
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .form.open { display: flex; }
+  .form label {
+    font-size: 13px;
+    color: var(--soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .form textarea, .form input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    resize: vertical;
+  }
+  .form textarea { min-height: 90px; }
+  .drop {
+    border: 1.5px dashed var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 14px;
+    cursor: pointer;
+    background: var(--bg);
+  }
+  .drop.has { padding: 8px; border-style: solid; }
+  .drop img { max-width: 100%; border-radius: 8px; display: block; }
+  .form-actions { display: flex; gap: 10px; }
+  .save {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .cancel {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--soft);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .shelf { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+  .post {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 560px) {
+    .post { flex-direction: row; }
+    .thumb { width: 180px; flex-shrink: 0; }
+  }
+  .thumb {
+    background: linear-gradient(135deg, #EEF0E2, #E2E7CE);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-ink);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .caption { font-size: 15px; white-space: pre-wrap; }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 10px; }
+  .tag { font-size: 12px; color: var(--soft); text-transform: uppercase; letter-spacing: 0.05em; }
+  .btns { display: flex; gap: 8px; }
+  .copy, .del {
+    border: 1px solid var(--line);
+    background: var(--bg);
+    font-size: 14px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .copy { color: var(--ink); }
+  .copy:hover { background: #F1F0E8; }
+  .copy.done { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .del { color: var(--danger); }
+  .del:hover { background: #F7ECE8; }
+
+  .empty { color: var(--soft); font-size: 15px; text-align: center; padding: 40px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Content shelf</h1>
+  <p class="sub">Image plus caption, ready to grab. Everything saves on this Mac.</p>
+
+  <div class="addbar">
+    <button class="addbtn" id="addToggle">+ Add a post</button>
+  </div>
+
+  <div class="form" id="form">
+    <div>
+      <label>Image</label>
+      <div class="drop" id="drop">Click to choose an image</div>
+      <input type="file" id="file" accept="image/*" hidden>
+    </div>
+    <div>
+      <label>Caption</label>
+      <textarea id="caption" placeholder="Write your caption..."></textarea>
+    </div>
+    <div>
+      <label>Tag (optional)</label>
+      <input type="text" id="tag" placeholder="e.g. Launch">
+    </div>
+    <div class="form-actions">
+      <button class="save" id="save">Save post</button>
+      <button class="cancel" id="cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="shelf" id="shelf"></div>
+</div>
+
+<script>
+  var KEY = 'contentShelf.posts.v1';
+  var posts = [];
+  var pendingImage = null;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      posts = raw ? JSON.parse(raw) : seed();
+    } catch (e) { posts = seed(); }
+    render();
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(posts)); }
+    catch (e) { alert('Storage is full. Try a smaller image.'); }
+  }
+  function seed() {
+    return [
+      { id: 1, img: null, tag: 'Launch', caption: 'Finished this in May. Sat with it, tested it, let it breathe. Some things are worth finishing slowly. This is my new site.' },
+      { id: 2, img: null, tag: 'Craft', caption: '23 pages, hand coded. I wanted to get it right before I put it out. That takes the time it takes.' }
+    ];
+  }
+
+  function render() {
+    var shelf = document.getElementById('shelf');
+    shelf.innerHTML = '';
+    if (!posts.length) {
+      shelf.innerHTML = '<div class="empty">No posts yet. Tap "Add a post" to start.</div>';
+      return;
+    }
+    posts.forEach(function (p) {
+      var post = document.createElement('div');
+      post.className = 'post';
+      var thumb = p.img
+        ? '<div class="thumb"><img src="' + p.img + '" alt=""></div>'
+        : '<div class="thumb">No image</div>';
+      var tag = p.tag ? '<span class="tag">' + escapeHtml(p.tag) + '</span>' : '<span></span>';
+      post.innerHTML =
+        thumb +
+        '<div class="body">' +
+          '<div class="caption">' + escapeHtml(p.caption) + '</div>' +
+          '<div class="foot">' + tag +
+            '<div class="btns">' +
+              '<button class="copy">Copy</button>' +
+              '<button class="del">Delete</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      post.querySelector('.copy').addEventListener('click', function (e) {
+        var btn = e.target;
+        navigator.clipboard.writeText(p.caption).then(function () {
+          btn.textContent = 'Copied';
+          btn.classList.add('done');
+          setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1500);
+        });
+      });
+      post.querySelector('.del').addEventListener('click', function () {
+        if (confirm('Delete this post?')) {
+          posts = posts.filter(function (x) { return x.id !== p.id; });
+          save(); render();
+        }
+      });
+      shelf.appendChild(post);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  var form = document.getElementById('form');
+  var drop = document.getElementById('drop');
+  var fileInput = document.getElementById('file');
+
+  document.getElementById('addToggle').addEventListener('click', function () {
+    form.classList.toggle('open');
+  });
+  document.getElementById('cancel').addEventListener('click', resetForm);
+  drop.addEventListener('click', function () { fileInput.click(); });
+  fileInput.addEventListener('change', function () {
+    var f = fileInput.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      pendingImage = reader.result;
+      drop.classList.add('has');
+      drop.innerHTML = '<img src="' + pendingImage + '" alt="">';
+    };
+    reader.readAsDataURL(f);
+  });
+
+  document.getElementById('save').addEventListener('click', function () {
+    var caption = document.getElementById('caption').value.trim();
+    var tag = document.getElementById('tag').value.trim();
+    if (!caption) { alert('Add a caption first.'); return; }
+    posts.unshift({ id: Date.now(), img: pendingImage, tag: tag, caption: caption });
+    save(); render(); resetForm();
+  });
+
+  function resetForm() {
+    form.classList.remove('open');
+    document.getElementById('caption').value = '';
+    document.getElementById('tag').value = '';
+    pendingImage = null;
+    drop.classList.remove('has');
+    drop.textContent = 'Click to choose an image';
+    fileInput.value = '';
+  }
+
+  load();
+</script>
+</body>
+</html>
