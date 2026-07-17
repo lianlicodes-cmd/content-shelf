@@ -4,40 +4,49 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Content Shelf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #FBFAF6;
-    --card: #FFFFFF;
-    --ink: #1A1A17;
-    --soft: #6E6E66;
-    --line: #E7E5DC;
-    --accent: #A9C23F;
-    --accent-ink: #3B4718;
+    --bg: #f1f2ec;
+    --card: #ffffff;
+    --ink: #00063d;
+    --soft: #5b6079;
+    --line: #dfe0d8;
+    --cyan: #05e0e9;
+    --lime: #bff47b;
+    --navy: #00063d;
     --danger: #B4472F;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: "Syne", system-ui, sans-serif;
     line-height: 1.5;
     padding: 32px 20px 100px;
   }
   .wrap { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
-  .sub { color: var(--soft); font-size: 15px; margin-top: 6px; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { color: var(--soft); font-size: 15px; margin-top: 6px; font-weight: 500; }
 
   .addbar { margin: 28px 0 8px; }
   .addbtn {
-    background: var(--ink);
+    background: var(--navy);
     color: #fff;
     border: none;
     border-radius: 999px;
-    font-size: 15px;
-    padding: 11px 20px;
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 22px;
     cursor: pointer;
+    transition: transform 150ms ease-out, background-color 150ms ease-out;
   }
-  .addbtn:hover { opacity: 0.9; }
+  .addbtn:hover { background: #050b55; transform: translateY(-1px); }
 
   .form {
     background: var(--card);
@@ -51,10 +60,11 @@
   }
   .form.open { display: flex; }
   .form label {
-    font-size: 13px;
+    font-size: 0.72rem;
     color: var(--soft);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.16em;
+    font-weight: 700;
     display: block;
     margin-bottom: 6px;
   }
@@ -64,11 +74,12 @@
     border-radius: 10px;
     padding: 10px 12px;
     font-size: 15px;
-    font-family: inherit;
+    font-family: "Syne", sans-serif;
     color: var(--ink);
     background: var(--bg);
     resize: vertical;
   }
+  .form textarea:focus, .form input:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
   .form textarea { min-height: 90px; }
   .drop {
     border: 1.5px dashed var(--line);
@@ -77,6 +88,7 @@
     text-align: center;
     color: var(--soft);
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     background: var(--bg);
   }
@@ -84,21 +96,30 @@
   .drop img { max-width: 100%; border-radius: 8px; display: block; }
   .form-actions { display: flex; gap: 10px; }
   .save {
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--lime);
+    color: var(--navy);
     border: none;
     border-radius: 999px;
-    padding: 10px 20px;
-    font-size: 15px;
+    padding: 11px 22px;
+    font-family: "Syne", sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     cursor: pointer;
+    transition: transform 150ms ease-out;
   }
+  .save:hover { transform: translateY(-1px); }
   .cancel {
     background: none;
     border: 1px solid var(--line);
     color: var(--soft);
     border-radius: 999px;
-    padding: 10px 20px;
-    font-size: 15px;
+    padding: 11px 22px;
+    font-family: "Syne", sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
     cursor: pointer;
   }
 
@@ -116,44 +137,58 @@
     .thumb { width: 180px; flex-shrink: 0; }
   }
   .thumb {
-    background: linear-gradient(135deg, #EEF0E2, #E2E7CE);
+    background: linear-gradient(135deg, var(--cyan), var(--lime));
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent-ink);
-    font-size: 13px;
-    letter-spacing: 0.04em;
+    color: var(--navy);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     overflow: hidden;
   }
   .thumb img { width: 100%; height: 100%; object-fit: cover; }
   .body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
-  .caption { font-size: 15px; white-space: pre-wrap; }
+  .caption { font-size: 15px; white-space: pre-wrap; font-weight: 500; }
   .foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 10px; }
-  .tag { font-size: 12px; color: var(--soft); text-transform: uppercase; letter-spacing: 0.05em; }
+  .tag {
+    font-size: 0.68rem;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    background: var(--lime);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
   .btns { display: flex; gap: 8px; }
   .copy, .del {
     border: 1px solid var(--line);
     background: var(--bg);
-    font-size: 14px;
-    padding: 7px 14px;
+    font-family: "Syne", sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 15px;
     border-radius: 999px;
     cursor: pointer;
   }
-  .copy { color: var(--ink); }
-  .copy:hover { background: #F1F0E8; }
-  .copy.done { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .copy { color: var(--navy); }
+  .copy:hover { background: #e8e9e1; }
+  .copy.done { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
   .del { color: var(--danger); }
   .del:hover { background: #F7ECE8; }
 
-  .empty { color: var(--soft); font-size: 15px; text-align: center; padding: 40px 0; }
+  .empty { color: var(--soft); font-size: 15px; text-align: center; padding: 40px 0; font-weight: 500; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Content shelf</h1>
-  <p class="sub">Image plus caption, ready to grab. Everything saves on this Mac.</p>
+  <p class="sub">Image plus caption, ready to grab. Everything saves in this browser.</p>
 
   <div class="addbar">
     <button class="addbtn" id="addToggle">+ Add a post</button>
