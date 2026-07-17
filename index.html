@@ -17,7 +17,7 @@
     --cyan: #05e0e9;
     --lime: #bff47b;
     --navy: #00063d;
-    --danger: #B4472F;
+    --danger: #e5341c;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -28,13 +28,13 @@
     padding: 32px 20px 100px;
   }
   .wrap { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
+  h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.01em; }
   .sub { color: var(--soft); font-size: 15px; margin-top: 6px; font-weight: 500; }
 
   .addbar { margin: 28px 0 8px; }
   .addbtn {
-    background: var(--navy);
-    color: #fff;
+    background: var(--lime);
+    color: var(--navy);
     border: none;
     border-radius: 999px;
     font-family: "Syne", sans-serif;
@@ -46,7 +46,7 @@
     cursor: pointer;
     transition: transform 150ms ease-out, background-color 150ms ease-out;
   }
-  .addbtn:hover { background: #050b55; transform: translateY(-1px); }
+  .addbtn:hover { background: #aee868; transform: translateY(-1px); }
 
   .form {
     background: var(--card);
@@ -137,14 +137,14 @@
     .thumb { width: 180px; flex-shrink: 0; }
   }
   .thumb {
-    background: linear-gradient(135deg, var(--cyan), var(--lime));
+    background: #e8e9e1;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--navy);
+    color: var(--soft);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     overflow: hidden;
@@ -152,17 +152,7 @@
   .thumb img { width: 100%; height: 100%; object-fit: cover; }
   .body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
   .caption { font-size: 15px; white-space: pre-wrap; font-weight: 500; }
-  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 10px; }
-  .tag {
-    font-size: 0.68rem;
-    color: var(--navy);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-weight: 700;
-    background: var(--lime);
-    padding: 4px 10px;
-    border-radius: 999px;
-  }
+  .foot { display: flex; align-items: center; justify-content: flex-end; margin-top: auto; gap: 10px; }
   .btns { display: flex; gap: 8px; }
   .copy, .del {
     border: 1px solid var(--line);
@@ -176,11 +166,11 @@
     border-radius: 999px;
     cursor: pointer;
   }
-  .copy { color: var(--navy); }
-  .copy:hover { background: #e8e9e1; }
+  .copy { color: var(--navy); background: var(--lime); border-color: var(--lime); }
+  .copy:hover { background: #aee868; }
   .copy.done { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
-  .del { color: var(--danger); }
-  .del:hover { background: #F7ECE8; }
+  .del { color: #fff; background: #ff2d16; border-color: #ff2d16; }
+  .del:hover { background: #e5341c; }
 
   .empty { color: var(--soft); font-size: 15px; text-align: center; padding: 40px 0; font-weight: 500; }
 </style>
@@ -203,10 +193,6 @@
     <div>
       <label>Caption</label>
       <textarea id="caption" placeholder="Write your caption..."></textarea>
-    </div>
-    <div>
-      <label>Tag (optional)</label>
-      <input type="text" id="tag" placeholder="e.g. Launch">
     </div>
     <div class="form-actions">
       <button class="save" id="save">Save post</button>
@@ -235,8 +221,8 @@
   }
   function seed() {
     return [
-      { id: 1, img: null, tag: 'Launch', caption: 'Finished this in May. Sat with it, tested it, let it breathe. Some things are worth finishing slowly. This is my new site.' },
-      { id: 2, img: null, tag: 'Craft', caption: '23 pages, hand coded. I wanted to get it right before I put it out. That takes the time it takes.' }
+      { id: 1, img: null, caption: 'Finished this in May. Sat with it, tested it, let it breathe. Some things are worth finishing slowly. This is my new site.' },
+      { id: 2, img: null, caption: '23 pages, hand coded. I wanted to get it right before I put it out. That takes the time it takes.' }
     ];
   }
 
@@ -253,12 +239,11 @@
       var thumb = p.img
         ? '<div class="thumb"><img src="' + p.img + '" alt=""></div>'
         : '<div class="thumb">No image</div>';
-      var tag = p.tag ? '<span class="tag">' + escapeHtml(p.tag) + '</span>' : '<span></span>';
       post.innerHTML =
         thumb +
         '<div class="body">' +
           '<div class="caption">' + escapeHtml(p.caption) + '</div>' +
-          '<div class="foot">' + tag +
+          '<div class="foot">' +
             '<div class="btns">' +
               '<button class="copy">Copy</button>' +
               '<button class="del">Delete</button>' +
@@ -312,16 +297,14 @@
 
   document.getElementById('save').addEventListener('click', function () {
     var caption = document.getElementById('caption').value.trim();
-    var tag = document.getElementById('tag').value.trim();
     if (!caption) { alert('Add a caption first.'); return; }
-    posts.unshift({ id: Date.now(), img: pendingImage, tag: tag, caption: caption });
+    posts.unshift({ id: Date.now(), img: pendingImage, caption: caption });
     save(); render(); resetForm();
   });
 
   function resetForm() {
     form.classList.remove('open');
     document.getElementById('caption').value = '';
-    document.getElementById('tag').value = '';
     pendingImage = null;
     drop.classList.remove('has');
     drop.textContent = 'Click to choose an image';
